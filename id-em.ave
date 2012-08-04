@@ -1,0 +1,74 @@
+' Name: View.IDm
+' Title:  Generates and Adds Sequentially identifiers to each elements in Active Themes
+' Topic:  Tables
+'
+' Description:  Adds a new field named "ID" to the tableof all active themes. The new field is filled
+' with sequentially generated ID Codes. User will have to set the generation pattern through an Input Box by setting a 
+' custom prefix string, a custom suffix string, a generation seed and the incrementating step.
+' In case the field "ID" already exists in one of the active theme tables,the user will be asked what to do.
+'
+' Requires:  At least one active theme. 
+' Self: 
+'  
+' Author: Roland Yonaba (roland.yonaba@gmail.com) 
+'
+' Returns: 
+
+' Gets the last active view and the active theme list
+theView = av.getActiveDoc
+theActiveThemeList = theView.GetActiveThemes
+
+
+'Stops running script if there is no active themes
+if (theActiveThemeList.Count = 0) then
+	MsgBox.Info("No Active Theme in the current view","No Active Theme Found")
+	exit
+end
+
+'Iterates 
+for each theTheme in theActiveThemeList
+	
+	theFTab = theTheme.GetFTab
+	theFields = theFTab.GetFields
+	theEditState = theFTab.IsEditable
+  
+	if (theFTab.CanEdit) then
+		theFTab.SetEditable(true)
+			if ((theFTab.CanAddFields).Not) then
+				MsgBox.Info("Table Writing Denied"+NL+"Cannot add Fields to this table","Error")
+				theFTab.SetEditable(false)
+				Continue
+			end
+	else
+		theFTab.SetEditable(false)
+		MsgBox.Info("Cannot modify table","Error")
+		Continue
+	end
+  
+	isID = (theFTab.FindField("ID")=NIL).Not
+	
+	if (isID) then
+		if (MsgBox.YesNo("Overwrite ID Field?","ID Existing Field Found",false)) then
+			theFTab.RemoveFields({theFTab.FindField("ID")})
+		else 
+			theFTab.SetEditable(false)
+			Continue
+		end
+	end
+  
+	thePrefix = MsgBox.Input("Enter Prefix","Prefix ?","ID")
+	theSuffix = MsgBox.Input("Enter Suffix","Suffix ?"," ")
+	theIncrement = MsgBox.Input("Enter Increment Initial Value","Initial Value","0").AsNumber
+	theIncrementStep = MsgBox.Input("Enter Increment Step","Increment Step","1").AsNumber
+  
+	theFieldID = Field.Make("ID",#FIELD_CHAR,20,0)
+	TheFtab.AddFields({TheFieldID})
+  
+	for each record in theFTab
+		theFTab.SetValueString(theFieldID,record,(thePrefix.AsString+theIncrement.AsString+theSuffix.AsString))
+		theIncrement = theIncrement+theIncrementStep
+	end
+	
+	theFTab.SetEditable(false)
+	
+end  
