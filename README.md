@@ -35,3 +35,6 @@ Copyright (c) 2012 Roland Yonaba.
 
     3. This notice may not be removed or altered from any source
     distribution.
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/Yonaba/id-em/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
